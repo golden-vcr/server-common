@@ -28,12 +28,16 @@ of the project name.
 Test functions for database queries can be written like so:
 
 	func Test_foo(t *testing.T) {
-		// This statement will skip the test if our test db isn't running in docker
-		db := querytest.Prepare(t)
+		// PrepareTx will skip the test if our test db isn't running in docker
+		tx := querytest.PrepareTx(t)
+		q := queries.New(tx)
 
-		// If we've made it here, we can connect to the provided db to test our queries
-		err := db.Dial(context.Background())
+		// Run one of our sqlc-compiled database queries against our test DB
+		err := queries.RecordSomething(context.Background())
 		assert.NoError(t, err)
+
+		// Verify that the new state (in our pending transaction) is what we expect
+		querytest.AssertCount(t, tx, 1, "SELECT COUNT(*) FROM something")
 	}
 
 Once a querytest database has been started for the relevant project, tests that use
