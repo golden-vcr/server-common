@@ -6,7 +6,7 @@ import (
 	"errors"
 	"testing"
 
-	impl "github.com/golden-vcr/tapes/gen/querytest/internal"
+	impl "github.com/golden-vcr/server-common/querytest/internal"
 
 	_ "github.com/lib/pq"
 )
