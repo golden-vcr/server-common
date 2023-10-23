@@ -33,3 +33,16 @@ func AssertCount(t *testing.T, tx *sql.Tx, wantCount int, query string, args ...
 		t.Fatalf(err.Error())
 	}
 }
+
+// AssertNumRowsChanged inspects a sql.Result to verify that the expected number of rows
+// were changed by the operation. Useful for validating queries that update records
+// conditionally, etc.
+func AssertNumRowsChanged(t *testing.T, res sql.Result, wantNumRows int) {
+	numRows, err := res.RowsAffected()
+	if err != nil {
+		t.Fatalf("failed to get number of rows changed: %v", err)
+	}
+	if numRows != int64(wantNumRows) {
+		t.Fatalf("expected operation to change %d rows; instead it changed %d", wantNumRows, numRows)
+	}
+}
