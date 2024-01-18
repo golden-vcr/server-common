@@ -75,6 +75,19 @@ func Log(r *http.Request) *slog.Logger {
 	return slog.Default()
 }
 
+// ConveyRequestId checks to see if it's being called in the context of an HTTP request
+// with a valid X-Request-Id, and if so, it modified an outgoing HTTP request to carry
+// the same request ID as a header
+func ConveyRequestId(ctx context.Context, req *http.Request) *http.Request {
+	if req.Header.Get("x-request-id") == "" {
+		requestId, ok := ctx.Value("x-request-id").(string)
+		if ok && requestId != "" {
+			req.Header.Set("x-request-id", requestId)
+		}
+	}
+	return req
+}
+
 // statusRecorder wraps an http.ResponseWriter in order to intercept and store the HTTP
 // status code for the response to a request
 type statusRecorder struct {
