@@ -49,6 +49,7 @@ func Middleware(logger *slog.Logger) func(http.Handler) http.Handler {
 			start := time.Now()
 			next.ServeHTTP(&recorder, r)
 			elapsed := time.Since(start)
+			elapsedMilliseconds := float64(elapsed.Nanoseconds()) / float64(1000000)
 
 			// Write a final log message indicating that the request is finished
 			level := slog.LevelError
@@ -57,7 +58,7 @@ func Middleware(logger *slog.Logger) func(http.Handler) http.Handler {
 			}
 			reqLogger.Log(nil, level,
 				"Request finished",
-				"elapsedNanoseconds", elapsed.Nanoseconds(),
+				"elapsedMilliseconds", elapsedMilliseconds,
 				"status", recorder.status,
 			)
 		})
