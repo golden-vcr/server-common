@@ -19,7 +19,7 @@ type Application interface {
 func NewApplication(name string) Application {
 	// Prepare a logger that we can write structured log messages to
 	pid := os.Getpid()
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil)).With("pid", pid)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil)).With("pid", pid).With("application", name)
 	logger.Info("Process starting")
 
 	// Shut down cleanly on signal
