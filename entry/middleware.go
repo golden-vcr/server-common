@@ -81,6 +81,14 @@ type statusRecorder struct {
 	status int
 }
 
+func (r *statusRecorder) Write(data []byte) (int, error) {
+	n, err := r.ResponseWriter.Write(data)
+	if err == nil && r.status == 0 {
+		r.status = http.StatusOK
+	}
+	return n, err
+}
+
 func (r *statusRecorder) WriteHeader(status int) {
 	r.status = status
 	r.ResponseWriter.WriteHeader(status)
