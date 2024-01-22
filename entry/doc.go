@@ -4,9 +4,8 @@
 // Example usage:
 //
 //	func main() {
-//		app := entry.NewApplication("test")
+//		app, ctx := entry.NewApplication("test")
 //		defer app.Stop()
-//		ctx := app.Context()
 //
 //		app.Log().Info("Doing some setup")
 //		if err := doSomeSetup(); err != nil {
