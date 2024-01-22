@@ -6,6 +6,7 @@
 //	func main() {
 //		app := entry.NewApplication("test")
 //		defer app.Stop()
+//		ctx := app.Context()
 //
 //		app.Log().Info("Doing some setup")
 //		if err := doSomeSetup(); err != nil {
@@ -14,6 +15,6 @@
 //
 //		h := &somethingThatImplementsHttpHandler{}
 //
-//		entry.RunServer(app, h, "", 5000)
+//		entry.RunServer(ctx, app.Log(), h, "", 5000)
 //	}
 package entry

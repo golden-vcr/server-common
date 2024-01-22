@@ -5,39 +5,41 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"golang.org/x/exp/slog"
 	"golang.org/x/sync/errgroup"
 )
 
 // RunServer blocks while an HTTP server application runs
-func RunServer(a Application, handler http.Handler, bindAddr string, listenPort int) {
+func RunServer(ctx context.Context, logger *slog.Logger, handler http.Handler, bindAddr string, listenPort int) {
 	// Prepare an http.Server with reasonable default config, using our provided handler
 	addr := fmt.Sprintf("%s:%d", bindAddr, listenPort)
 	server := &http.Server{
 		Addr:     addr,
-		Handler:  Middleware(a.Log())(handler),
-		ErrorLog: NewErrorLog(*a.Log()),
+		Handler:  Middleware(logger)(handler),
+		ErrorLog: NewErrorLog(*logger),
 	}
 
 	// Kick off a goroutine which calls server.ListenAndServe()
-	a.Log().Info("Now listening", "bindAddr", bindAddr, "listenPort", listenPort)
+	logger.Info("Now listening", "bindAddr", bindAddr, "listenPort", listenPort)
 	var wg errgroup.Group
 	wg.Go(server.ListenAndServe)
 
 	// If our application-level context is closed, abort
 	select {
-	case <-a.Context().Done():
-		a.Log().Info("Received signal; closing server")
+	case <-ctx.Done():
+		logger.Info("Application context is done; closing server")
 		server.Shutdown(context.Background())
 	}
 
 	// Otherwise, block until ListenAndServe returns
 	err := wg.Wait()
 	if err == http.ErrServerClosed {
-		a.Log().Info("Server closed")
+		logger.Info("Server closed")
 	} else {
-		a.Fail("error running server", err)
+		logger.Error("error running server", "error", err)
+		os.Exit(1)
 	}
 }
 
