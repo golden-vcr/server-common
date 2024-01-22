@@ -12,7 +12,7 @@ import (
 )
 
 // RunServer blocks while an HTTP server application runs
-func RunServer(ctx context.Context, logger *slog.Logger, handler http.Handler, bindAddr string, listenPort int) {
+func RunServer(ctx context.Context, logger *slog.Logger, handler http.Handler, bindAddr string, listenPort uint16) {
 	// Prepare an http.Server with reasonable default config, using our provided handler
 	addr := fmt.Sprintf("%s:%d", bindAddr, listenPort)
 	server := &http.Server{
