@@ -26,14 +26,20 @@ func RunServer(ctx context.Context, logger *slog.Logger, handler http.Handler, b
 	var wg errgroup.Group
 	wg.Go(server.ListenAndServe)
 
-	// If our application-level context is closed, abort
+	// Block indefinitely, running the server all the while, until our application-level
+	// context is done
 	select {
 	case <-ctx.Done():
-		logger.Info("Application context is done; closing server")
+		cancelErr := context.Cause(ctx)
+		if cancelErr != nil && cancelErr != ctx.Err() {
+			logger.Error("Closing server due to application error", "error", cancelErr)
+		} else {
+			logger.Info("Application is shutting down cleanly; closing server")
+		}
 		server.Shutdown(context.Background())
 	}
 
-	// Otherwise, block until ListenAndServe returns
+	// Block until ListenAndServe returns so we can ensure that the server is closed
 	err := wg.Wait()
 	if err == http.ErrServerClosed {
 		logger.Info("Server closed")
