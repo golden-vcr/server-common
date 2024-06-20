@@ -43,6 +43,7 @@ func (p *producer) Send(ctx context.Context, jsonData []byte) error {
 	if err != nil {
 		return err
 	}
+	defer ch.Close()
 	mandatory := false
 	immediate := false
 	return ch.PublishWithContext(ctx, p.exchange, "", mandatory, immediate, amqp.Publishing{
