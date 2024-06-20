@@ -15,7 +15,7 @@ type Consumer interface {
 
 // NewConsumer initializes a Consumer from an AMQP client connection, configuring it to
 // receive messages from an exchange with the given name
-func NewConsumer(conn *amqp.Connection, exchange string) (Consumer, error) {
+func NewConsumer(conn *amqp.Connection, exchange string, autoAck bool) (Consumer, error) {
 	ch, err := conn.Channel()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create channel: %w", err)
@@ -37,6 +37,7 @@ func NewConsumer(conn *amqp.Connection, exchange string) (Consumer, error) {
 		ch:       ch,
 		q:        q,
 		exchange: exchange,
+		autoAck:  autoAck,
 	}, nil
 }
 
@@ -48,6 +49,7 @@ type consumer struct {
 	ch       *amqp.Channel
 	q        *amqp.Queue
 	exchange string
+	autoAck  bool
 }
 
 func (c *consumer) Close() {
@@ -56,9 +58,8 @@ func (c *consumer) Close() {
 }
 
 func (c *consumer) Recv(ctx context.Context) (<-chan amqp.Delivery, error) {
-	autoAck := true
 	exclusive := false
 	noLocal := false
 	noWait := false
-	return c.ch.ConsumeWithContext(ctx, c.q.Name, "", autoAck, exclusive, noLocal, noWait, nil)
+	return c.ch.ConsumeWithContext(ctx, c.q.Name, "", c.autoAck, exclusive, noLocal, noWait, nil)
 }
