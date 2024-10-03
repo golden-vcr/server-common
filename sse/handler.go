@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/golden-vcr/server-common/entry"
-	"golang.org/x/exp/slog"
 )
 
 // Handler is an HTTP handler that serves a stream of data using Server-Sent Events

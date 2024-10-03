@@ -2,11 +2,11 @@ package entry
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/google/uuid"
-	"golang.org/x/exp/slog"
 )
 
 // Middleware injects HTTP response handler logic to facilitate tracing and logging:

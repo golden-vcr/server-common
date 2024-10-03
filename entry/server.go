@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
-	"golang.org/x/exp/slog"
 	"golang.org/x/sync/errgroup"
 )
 
