@@ -76,7 +76,7 @@ func Log(r *http.Request) *slog.Logger {
 }
 
 // ConveyRequestId checks to see if it's being called in the context of an HTTP request
-// with a valid X-Request-Id, and if so, it modified an outgoing HTTP request to carry
+// with a valid X-Request-Id, and if so, it modifies an outgoing HTTP request to carry
 // the same request ID as a header
 func ConveyRequestId(ctx context.Context, req *http.Request) *http.Request {
 	if req.Header.Get("x-request-id") == "" {
