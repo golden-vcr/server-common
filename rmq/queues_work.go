@@ -64,18 +64,18 @@ func (d *QueueDeclaration) newWorkProducer(conn *amqp.Connection, ch *amqp.Chann
 	}, nil
 }
 
-// workConsumer is an rmq.Consumer implementation that contends with other consumers to
+// workReceiver is an rmq.Receiver implementation that contends with other consumers to
 // receive messages from a work queue
-type workConsumer struct {
+type workReceiver struct {
 	ch *amqp.Channel
 	q  *amqp.Queue
 }
 
-func (c *workConsumer) Close() {
+func (c *workReceiver) Close() {
 	c.ch.Close()
 }
 
-func (c *workConsumer) Recv(ctx context.Context) (<-chan amqp.Delivery, error) {
+func (c *workReceiver) Recv(ctx context.Context) (<-chan amqp.Delivery, error) {
 	autoAck := false
 	exclusive := false
 	noLocal := false
@@ -83,13 +83,13 @@ func (c *workConsumer) Recv(ctx context.Context) (<-chan amqp.Delivery, error) {
 	return c.ch.ConsumeWithContext(ctx, c.q.Name, "", autoAck, exclusive, noLocal, noWait, nil)
 }
 
-func (d *QueueDeclaration) newWorkConsumer(ch *amqp.Channel) (Consumer, error) {
+func (d *QueueDeclaration) newWorkReceiver(ch *amqp.Channel) (Receiver, error) {
 	q, err := declareWorkQueue(ch, d.Name)
 	if err != nil {
 		ch.Close()
 		return nil, fmt.Errorf("failed to declare work queue '%s': %w", d.Name, err)
 	}
-	return &workConsumer{
+	return &workReceiver{
 		ch: ch,
 		q:  q,
 	}, nil

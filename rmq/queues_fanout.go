@@ -80,19 +80,19 @@ func (d *QueueDeclaration) newFanoutProducer(conn *amqp.Connection, ch *amqp.Cha
 	}, nil
 }
 
-// fanoutConsumer is an rmq.Consumer implementation that receives messages from a
+// fanoutReceiver is an rmq.Receiver implementation that receives messages from a
 // temporary queue bound to a fanout exchange
-type fanoutConsumer struct {
+type fanoutReceiver struct {
 	ch       *amqp.Channel
 	q        *amqp.Queue
 	exchange string
 }
 
-func (c *fanoutConsumer) Close() {
+func (c *fanoutReceiver) Close() {
 	c.ch.Close()
 }
 
-func (c *fanoutConsumer) Recv(ctx context.Context) (<-chan amqp.Delivery, error) {
+func (c *fanoutReceiver) Recv(ctx context.Context) (<-chan amqp.Delivery, error) {
 	autoAck := false
 	exclusive := false
 	noLocal := false
@@ -100,7 +100,7 @@ func (c *fanoutConsumer) Recv(ctx context.Context) (<-chan amqp.Delivery, error)
 	return c.ch.ConsumeWithContext(ctx, c.q.Name, "", autoAck, exclusive, noLocal, noWait, nil)
 }
 
-func (d *QueueDeclaration) newFanoutConsumer(ch *amqp.Channel) (Consumer, error) {
+func (d *QueueDeclaration) newFanoutReceiver(ch *amqp.Channel) (Receiver, error) {
 	if err := declareFanoutExchange(ch, d.Name); err != nil {
 		ch.Close()
 		return nil, fmt.Errorf("failed to declare fanout exchange '%s': %w", d.Name, err)
@@ -110,7 +110,7 @@ func (d *QueueDeclaration) newFanoutConsumer(ch *amqp.Channel) (Consumer, error)
 		ch.Close()
 		return nil, fmt.Errorf("failed to declare consumer queue for fanout exchange '%s': %w", d.Name, err)
 	}
-	return &fanoutConsumer{
+	return &fanoutReceiver{
 		ch:       ch,
 		q:        q,
 		exchange: d.Name,
