@@ -8,8 +8,8 @@ import (
 const (
 	PostgresImage       = "postgres:16"
 	PostgresPassword    = "password"
-	PostgresHostPortMin = 54000
-	PostgresHostPortMax = 54999
+	PostgresHostPortMin = 44000
+	PostgresHostPortMax = 44999
 )
 
 // GetContainerName returns the canonical name for the docker container that runs a
